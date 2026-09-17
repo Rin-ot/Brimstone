@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-import random
+import random, datetime
 
 class UtilityCog(commands.Cog):
     def __init__(self, bot):
@@ -22,7 +22,20 @@ class UtilityCog(commands.Cog):
         if not before.channel and after.channel:
             sys_channel = member.guild.system_channel
             if sys_channel:
-                await sys_channel.send(f"🔊 {member.display_name} が {after.channel.name} に入室しました！")
-                
+                message = [message async for message in sys_channel.history(limit=1)][0]
+                if message and message.author == self.bot.user and message.embeds[0].title == "📞 参加通知":
+                    if len(list(after.channel.members)) == 1:
+                        e = discord.Embed(title = f"📞 参加通知", description = f"🔊 {member.mention} が {after.channel.mention} に入室しました！", color = 0x3377bb)
+                        await sys_channel.send(embed=e)
+
+                    else:
+                        e = message.embeds[0]
+                        e.description += f"\n🔊 {member.mention} が {after.channel.mention} に入室しました！ ｜ <t:{round(datetime.datetime.now().timestamp())}:R>"
+                        await message.edit(embed=e)
+
+                else:
+                    e = discord.Embed(title = f"📞 参加通知", description = f"🔊 {member.mention} が {after.channel.mention} に入室しました！", color = 0x3377bb)
+                    await sys_channel.send(embed=e)
+
 async def setup(bot):
     await bot.add_cog(UtilityCog(bot))

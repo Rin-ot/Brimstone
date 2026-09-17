@@ -62,7 +62,6 @@ class TeamPanel(discord.ui.View):
             
         await interaction.response.edit_message(embed=embed, view=self)
 
-
 class ValorantCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
